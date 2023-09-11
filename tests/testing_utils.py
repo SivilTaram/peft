@@ -13,8 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import unittest
+from contextlib import contextmanager
 
+import numpy as np
 import torch
+
+from peft.import_utils import is_auto_gptq_available, is_optimum_available
 
 
 def require_torch_gpu(test_case):
@@ -47,3 +51,41 @@ def require_bitsandbytes(test_case):
         return unittest.skip("test requires bitsandbytes")(test_case)
     else:
         return test_case
+
+
+def require_auto_gptq(test_case):
+    """
+    Decorator marking a test that requires auto-gptq. These tests are skipped when auto-gptq isn't installed.
+    """
+    return unittest.skipUnless(is_auto_gptq_available(), "test requires auto-gptq")(test_case)
+
+
+def require_optimum(test_case):
+    """
+    Decorator marking a test that requires optimum. These tests are skipped when optimum isn't installed.
+    """
+    return unittest.skipUnless(is_optimum_available(), "test requires optimum")(test_case)
+
+
+@contextmanager
+def temp_seed(seed: int):
+    """Temporarily set the random seed. This works for python numpy, pytorch."""
+
+    np_state = np.random.get_state()
+    np.random.seed(seed)
+
+    torch_state = torch.random.get_rng_state()
+    torch.random.manual_seed(seed)
+
+    if torch.cuda.is_available():
+        torch_cuda_states = torch.cuda.get_rng_state_all()
+        torch.cuda.manual_seed_all(seed)
+
+    try:
+        yield
+    finally:
+        np.random.set_state(np_state)
+
+        torch.random.set_rng_state(torch_state)
+        if torch.cuda.is_available():
+            torch.cuda.set_rng_state_all(torch_cuda_states)

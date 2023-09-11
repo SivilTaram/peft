@@ -30,6 +30,8 @@ Supported methods:
 3. P-Tuning: [GPT Understands, Too](https://arxiv.org/abs/2103.10385)
 4. Prompt Tuning: [The Power of Scale for Parameter-Efficient Prompt Tuning](https://arxiv.org/abs/2104.08691)
 5. AdaLoRA: [Adaptive Budget Allocation for Parameter-Efficient Fine-Tuning](https://arxiv.org/abs/2303.10512)  
+6. $(IA)^3$: [Few-Shot Parameter-Efficient Fine-Tuning is Better and Cheaper than In-Context Learning](https://arxiv.org/abs/2205.05638)
+7. MultiTask Prompt Tuning: [Multitask Prompt Tuning Enables Parameter-Efficient Transfer Learning](https://arxiv.org/abs/2303.02861)
 
 ## Getting started
 
@@ -66,7 +68,7 @@ Hardware: Single A100 80GB GPU with CPU RAM above 64GB
 
 Performance of PEFT-LoRA tuned [`bigscience/T0_3B`](https://huggingface.co/bigscience/T0_3B) on [`ought/raft/twitter_complaints`](https://huggingface.co/datasets/ought/raft/viewer/twitter_complaints) leaderboard. 
 A point to note is that we didn't try to squeeze performance by playing around with input instruction templates, LoRA hyperparams and other training related hyperparams. Also, we didn't use the larger 13B [mt0-xxl](https://huggingface.co/bigscience/mt0-xxl) model.
-So, we are already seeing comparable performance to SoTA with parameter efficient tuning. Also, the final checkpoint size is just `19MB` in comparison to `11GB` size of the backbone [`bigscience/T0_3B`](https://huggingface.co/bigscience/T0_3B) model.
+So, we are already seeing comparable performance to SoTA with parameter efficient tuning. Also, the final additional checkpoint size is just `19MB` in comparison to `11GB` size of the backbone [`bigscience/T0_3B`](https://huggingface.co/bigscience/T0_3B) model, but one still has to load the original full size model.
 
 |   Submission Name        | Accuracy |
 | --------- | ---- |
@@ -76,7 +78,7 @@ So, we are already seeing comparable performance to SoTA with parameter efficien
 
 **Therefore, we can see that performance comparable to SoTA is achievable by PEFT methods with consumer hardware such as 16GB and 24GB GPUs.**
 
-A insightful blogpost explaining the advantages of using PEFT for fine-tuning FlanT5-XXL: [https://www.philschmid.de/fine-tune-flan-t5-peft](https://www.philschmid.de/fine-tune-flan-t5-peft)
+An insightful blogpost explaining the advantages of using PEFT for fine-tuning FlanT5-XXL: [https://www.philschmid.de/fine-tune-flan-t5-peft](https://www.philschmid.de/fine-tune-flan-t5-peft)
 
 ### Parameter Efficient Tuning of Diffusion Models
 
@@ -90,7 +92,7 @@ Hardware: Single A100 80GB GPU with CPU RAM above 64GB
 
 
 **Training**
-An example of using LoRA for parameter efficient dreambooth training is given in `~examples/lora_dreambooth/train_dreambooth.py`
+An example of using LoRA for parameter efficient dreambooth training is given in [`examples/lora_dreambooth/train_dreambooth.py`](examples/lora_dreambooth/train_dreambooth.py)
 
 ```bash
 export MODEL_NAME= "CompVis/stable-diffusion-v1-4" #"stabilityai/stable-diffusion-2-1"
@@ -139,7 +141,7 @@ Try out the 🤗 Gradio Space which should run seamlessly on a T4 instance:
 
 - Here is now a demo on how to fine tune [OPT-6.7b](https://huggingface.co/facebook/opt-6.7b) (14GB in fp16) in a Google Colab: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1jCkpikz0J2o20FBQmYmAGdiKmJGOMo-o?usp=sharing)
 
-- Here is now a demo on how to fine tune [whishper-large](openai/whisper-large-v2) (1.5B params) (14GB in fp16) in a Google Colab: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1DOkD_5OUjFa0r5Ik3SgywJLJtEo2qLxO?usp=sharing) and [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1vhF8yueFqha3Y3CpTHN6q9EVcII9EYzs?usp=sharing)
+- Here is now a demo on how to fine tune [whisper-large](https://huggingface.co/openai/whisper-large-v2) (1.5B params) (14GB in fp16) in a Google Colab: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1DOkD_5OUjFa0r5Ik3SgywJLJtEo2qLxO?usp=sharing) and [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1vhF8yueFqha3Y3CpTHN6q9EVcII9EYzs?usp=sharing)
 
 ### Save compute and storage even for medium and small models
 
@@ -223,68 +225,68 @@ An example is provided in `~examples/causal_language_modeling/peft_lora_clm_acce
 ## Models support matrix
 
 ### Causal Language Modeling
-| Model        | LoRA | Prefix Tuning  | P-Tuning | Prompt Tuning  |
-|--------------| ---- | ---- | ---- | ----  |
-| GPT-2        | ✅  | ✅  | ✅  | ✅  |
-| Bloom        | ✅  | ✅  | ✅  | ✅  |
-| OPT          | ✅  | ✅  | ✅  | ✅  |
-| GPT-Neo      | ✅  | ✅  | ✅  | ✅  |
-| GPT-J        | ✅  | ✅  | ✅  | ✅  |
-| GPT-NeoX-20B | ✅  | ✅  | ✅  | ✅  |
-| LLaMA        | ✅  | ✅  | ✅  | ✅  |
-| ChatGLM      | ✅  | ✅  | ✅  | ✅  |
+| Model        | LoRA | Prefix Tuning  | P-Tuning | Prompt Tuning  | IA3 |
+|--------------| ---- | ---- | ---- | ----  | ----  |
+| GPT-2        | ✅  | ✅  | ✅  | ✅  | ✅  |
+| Bloom        | ✅  | ✅  | ✅  | ✅  | ✅  |
+| OPT          | ✅  | ✅  | ✅  | ✅  | ✅  |
+| GPT-Neo      | ✅  | ✅  | ✅  | ✅  | ✅  |
+| GPT-J        | ✅  | ✅  | ✅  | ✅  | ✅  |
+| GPT-NeoX-20B | ✅  | ✅  | ✅  | ✅  | ✅  |
+| LLaMA        | ✅  | ✅  | ✅  | ✅  | ✅  |
+| ChatGLM      | ✅  | ✅  | ✅  | ✅  | ✅  |
 
 ### Conditional Generation
-|   Model         | LoRA | Prefix Tuning  | P-Tuning | Prompt Tuning  | 
-| --------- | ---- | ---- | ---- | ---- |
-| T5        | ✅   | ✅   | ✅   | ✅   |
-| BART      | ✅   | ✅   | ✅   | ✅   |
+|   Model         | LoRA | Prefix Tuning  | P-Tuning | Prompt Tuning  | IA3 |
+| --------- | ---- | ---- | ---- | ---- | ---- |
+| T5        | ✅   | ✅   | ✅   | ✅   | ✅   |
+| BART      | ✅   | ✅   | ✅   | ✅   | ✅   |
 
 ### Sequence Classification
-|   Model         | LoRA | Prefix Tuning  | P-Tuning | Prompt Tuning  | 
-| --------- | ---- | ---- | ---- | ----  |
-| BERT           | ✅  | ✅  | ✅  | ✅  |  
-| RoBERTa        | ✅  | ✅  | ✅  | ✅  |
-| GPT-2          | ✅  | ✅  | ✅  | ✅  | 
-| Bloom          | ✅  | ✅  | ✅  | ✅  |   
-| OPT            | ✅  | ✅  | ✅  | ✅  |
-| GPT-Neo        | ✅  | ✅  | ✅  | ✅  |
-| GPT-J          | ✅  | ✅  | ✅  | ✅  |
-| Deberta        | ✅  |     | ✅  | ✅  |     
-| Deberta-v2     | ✅  |     | ✅  | ✅  |    
+|   Model         | LoRA | Prefix Tuning  | P-Tuning | Prompt Tuning  | IA3 |
+| --------- | ---- | ---- | ---- | ----  | ----  |
+| BERT           | ✅  | ✅  | ✅  | ✅  |  ✅  |  
+| RoBERTa        | ✅  | ✅  | ✅  | ✅  | ✅  |
+| GPT-2          | ✅  | ✅  | ✅  | ✅  |   |
+| Bloom          | ✅  | ✅  | ✅  | ✅  |   |
+| OPT            | ✅  | ✅  | ✅  | ✅  |   |
+| GPT-Neo        | ✅  | ✅  | ✅  | ✅  |   |
+| GPT-J          | ✅  | ✅  | ✅  | ✅  |   |
+| Deberta        | ✅  |     | ✅  | ✅  |   | 
+| Deberta-v2     | ✅  |     | ✅  | ✅  |   |
 
 ### Token Classification
-|   Model         | LoRA | Prefix Tuning  | P-Tuning | Prompt Tuning  | 
-| --------- | ---- | ---- | ---- | ----  |
-| BERT           | ✅  | ✅  |   |   |  
-| RoBERTa        | ✅  | ✅  |   |   |
-| GPT-2          | ✅  | ✅  |   |   | 
-| Bloom          | ✅  | ✅  |   |   |   
-| OPT            | ✅  | ✅  |   |   |
-| GPT-Neo        | ✅  | ✅  |   |   |
-| GPT-J          | ✅  | ✅  |   |   |
-| Deberta        | ✅  |     |   |   | 
-| Deberta-v2     | ✅  |     |   |   |
+|   Model         | LoRA | Prefix Tuning  | P-Tuning | Prompt Tuning  | IA3 |
+| --------- | ---- | ---- | ---- | ----  | ----  |
+| BERT           | ✅  | ✅  |   |   |   |  
+| RoBERTa        | ✅  | ✅  |   |   |   |
+| GPT-2          | ✅  | ✅  |   |   |   |
+| Bloom          | ✅  | ✅  |   |   |   |
+| OPT            | ✅  | ✅  |   |   |   |
+| GPT-Neo        | ✅  | ✅  |   |   |   |
+| GPT-J          | ✅  | ✅  |   |   |   |
+| Deberta        | ✅  |     |   |   |   |
+| Deberta-v2     | ✅  |     |   |   |   |
 
 ### Text-to-Image Generation
 
-|   Model         | LoRA | Prefix Tuning  | P-Tuning | Prompt Tuning  | 
-| --------- | ---- | ---- | ---- | ----  |
-| Stable Diffusion           | ✅  |   |   |   |  
+|   Model         | LoRA | Prefix Tuning  | P-Tuning | Prompt Tuning  | IA3 |
+| --------- | ---- | ---- | ---- | ----  | ----  |
+| Stable Diffusion           | ✅  |   |   |   |   |  
 
 
 ### Image Classification
 
-|   Model         | LoRA | Prefix Tuning  | P-Tuning | Prompt Tuning  | 
-| --------- | ---- | ---- | ---- | ----  |
-| ViT           | ✅  |   |   |   | 
-| Swin           | ✅  |   |   |   | 
+|   Model         | LoRA | Prefix Tuning  | P-Tuning | Prompt Tuning  | IA3 |
+| --------- | ---- | ---- | ---- | ----  | ----  |
+| ViT           | ✅  |   |   |   |    | 
+| Swin           | ✅  |   |   |   |   |  
 
 ### Image to text (Multi-modal models)
 
-|   Model         | LoRA | Prefix Tuning  | P-Tuning | Prompt Tuning  | 
-| --------- | ---- | ---- | ---- | ----  |
-| Blip-2           | ✅  |   |   |   | 
+|   Model         | LoRA | Prefix Tuning  | P-Tuning | Prompt Tuning  | IA3
+| --------- | ---- | ---- | ---- | ----  | ----  |
+| Blip-2           | ✅  |   |   |   |   |
 
 ___Note that we have tested LoRA for [ViT](https://huggingface.co/docs/transformers/model_doc/vit) and [Swin](https://huggingface.co/docs/transformers/model_doc/swin) for fine-tuning on image classification. However, it should be possible to use LoRA for any compatible model [provided](https://huggingface.co/models?pipeline_tag=image-classification&sort=downloads&search=vit) by 🤗 Transformers. Check out the respective
 examples to learn more. If you run into problems, please open an issue.___
@@ -293,9 +295,9 @@ The same principle applies to our [segmentation models](https://huggingface.co/m
 
 ### Semantic Segmentation
 
-|   Model         | LoRA | Prefix Tuning  | P-Tuning | Prompt Tuning  | 
-| --------- | ---- | ---- | ---- | ----  |
-| SegFormer           | ✅  |   |   |   | 
+|   Model         | LoRA | Prefix Tuning  | P-Tuning | Prompt Tuning  | IA3 |
+| --------- | ---- | ---- | ---- | ----  | ----  |
+| SegFormer           | ✅  |   |   |   |   | 
 
 
 ## Caveats:
@@ -352,19 +354,47 @@ any GPU memory savings. Please refer issue [[FSDP] FSDP with CPU offload consume
   accelerate launch --config_file fsdp_config.yaml examples/peft_lora_seq2seq_accelerate_fsdp.py
   ```
 
-2. When using `P_TUNING` or `PROMPT_TUNING` with `SEQ_2_SEQ` task, remember to remove the `num_virtual_token` virtual prompt predictions from the left side of the model outputs during evaluations. 
+2. When using ZeRO3 with zero3_init_flag=True, if you find the gpu memory increase with training steps. we might need to update deepspeed after [deepspeed commit 42858a9891422abc](https://github.com/microsoft/DeepSpeed/commit/42858a9891422abcecaa12c1bd432d28d33eb0d4) . The related issue is [[BUG] Peft Training with Zero.Init() and Zero3 will increase GPU memory every forward step ](https://github.com/microsoft/DeepSpeed/issues/3002)
 
-3. For encoder-decoder models, `P_TUNING` or `PROMPT_TUNING` doesn't support `generate` functionality of transformers because `generate` strictly requires `decoder_input_ids` but 
-`P_TUNING`/`PROMPT_TUNING` appends soft prompt embeddings to `input_embeds` to create
-new `input_embeds` to be given to the model. Therefore, `generate` doesn't support this yet.
+## 🤗 PEFT as a utility library
 
-4. When using ZeRO3 with zero3_init_flag=True, if you find the gpu memory increase with training steps. we might need to set zero3_init_flag=false in accelerate config.yaml. The related issue is [[BUG] memory leak under zero.Init](https://github.com/microsoft/DeepSpeed/issues/2637)
+Inject trainable adapters on any `torch` model using `inject_adapter_in_model` method. Note the method will make no further change to the model.
 
-## Backlog:
-- [x] Add tests
-- [x] Multi Adapter training and inference support
-- [x] Add more use cases and examples
-- [ ] Explore and possibly integrate `Bottleneck Adapters`, `(IA)^3`, `AdaptionPrompt` ...
+```python
+import torch 
+from peft import inject_adapter_in_model, LoraConfig
+
+class DummyModel(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.embedding = torch.nn.Embedding(10, 10)
+        self.linear = torch.nn.Linear(10, 10)
+        self.lm_head = torch.nn.Linear(10, 10)
+    
+    def forward(self, input_ids):
+        x = self.embedding(input_ids)
+        x = self.linear(x)
+        x = self.lm_head(x)
+        return x
+
+lora_config = LoraConfig(
+    lora_alpha=16,
+    lora_dropout=0.1,
+    r=64,
+    bias="none",
+    target_modules=["linear"],
+)
+
+model = DummyModel()
+model = inject_adapter_in_model(lora_config, model)
+
+dummy_inputs = torch.LongTensor([[0, 1, 2, 3, 4, 5, 6, 7]])
+dummy_outputs = model(dummy_inputs)
+```
+
+## Contributing
+
+If you would like to contribute to PEFT, please check out our [contributing guide](https://huggingface.co/docs/peft/developer_guides/contributing).
 
 ## Citing 🤗 PEFT
 
@@ -373,7 +403,7 @@ If you use 🤗 PEFT in your publication, please cite it by using the following 
 ```bibtex
 @Misc{peft,
   title =        {PEFT: State-of-the-art Parameter-Efficient Fine-Tuning methods},
-  author =       {Sourab Mangrulkar, Sylvain Gugger, Lysandre Debut, Younes Belkada, Sayak Paul},
+  author =       {Sourab Mangrulkar and Sylvain Gugger and Lysandre Debut and Younes Belkada and Sayak Paul},
   howpublished = {\url{https://github.com/huggingface/peft}},
   year =         {2022}
 }
